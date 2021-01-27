@@ -1,12 +1,13 @@
-import { IconSearch } from '@assets/svg';
+import { IconSearch, IconTrash } from '@assets/svg';
 import { ItemCollection } from '@components/atoms';
 import Header from '@components/atoms/Header';
+import PopupDelete from '@components/atoms/PopupDelete';
 import color from '@config/colors';
 import stylesGeneral from '@config/stylesGeneral';
 import { useNavigation } from '@react-navigation/native';
 import React, { Component, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 
 const testData = [{
     id: "1",
@@ -47,8 +48,8 @@ const renderItem = ({ item }) => (
 const CollectionEdit = () => {
     return (
         <View style={stylesGeneral.container}>
-            <Header title="Collection" paddingLeft={16} />
-
+            <Header title="Collection" paddingLeft={16} buttonRight={true}/>
+          
             <View style={styles.searchBg}>
                 <View style={styles.iconSearchBg}>
                     <IconSearch />
@@ -71,6 +72,18 @@ const CollectionEdit = () => {
                     numColumns={2}
                 />
             </View>
+            <View style={styles.constainMenu}>
+                <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonEdit]}>
+                    <Text style={styles.textButtonEdit}>Rename</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonEdit]}>
+                    <Text style={styles.textButtonEdit}>Move</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonDelete]}>
+                    <IconTrash/>
+                </TouchableOpacity>
+            </View>
+
 
         </View>
     )
@@ -104,7 +117,35 @@ const styles = StyleSheet.create({
         padding: 8,
         marginTop: 8,
         flex: 1,
-    }
+    },
+    constainMenu: {
+        height: 48,
+        marginBottom: 22,
+        zIndex: 1,
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        flexDirection: 'row'
+    },
+    buttonEdit: {
+        height: 48,
+        width: 90,
+        borderRadius: 12,
+        backgroundColor: color.BG_BUTTON,
+        marginHorizontal: 8
+    },
+    textButtonEdit: {
+        fontSize: 16,
+        color: color.TITLE
+    },
+    buttonDelete: {
+        height: 48,
+        width: 48,
+        borderRadius: 12,
+        backgroundColor: color.BG_BUTTON_DELETE,
+        marginLeft: 8,
+        marginRight: 16
+    },
 })
 
 export default CollectionEdit;
