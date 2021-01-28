@@ -11,7 +11,10 @@ const stylesGeneral = StyleSheet.create({
         alignItems: 'center'
     },
     styleTextNormal: {
-        fontSize: 16, fontWeight: 'bold', color: color.TITLE, textAlign: 'center'
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: color.TITLE,
+        textAlign: 'center'
     }
 })
 

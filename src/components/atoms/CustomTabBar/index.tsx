@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, TouchableOpacity, View } from "react-native";
 import Feather from 'react-native-vector-icons/Feather';
 import { IconDownArrow, IconMusic, IconSetting } from "@assets/svg"
@@ -8,10 +8,13 @@ import ControlMusic from '../ControlMusic';
 import { useSelector, useDispatch } from 'react-redux';
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
-    const showMusic = useSelector((store: any) => store?.showMusic)
+    const showMusic = useSelector((state: any) => state?.showMusic)
+    const hiddenTabbar = useSelector((state: any) => state?.hiddenTabbar)
+
     return (
         <View>
             {showMusic ? <ControlMusic /> : null}
+            {hiddenTabbar ? null : (
             <View style={[stylesGeneral.centerAll, { backgroundColor: color.BG_BUTTON, height: 62, flexDirection: 'row', borderTopWidth: 1, borderColor: "#3e3e3e" }]}>
                 {state.routes.map((route: any, index: any) => {
                     const { options } = descriptors[route.key];
@@ -90,6 +93,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                     );
                 })}
             </View>
+            )}
 
         </View>
     )

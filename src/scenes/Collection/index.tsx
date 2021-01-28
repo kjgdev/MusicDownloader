@@ -1,54 +1,45 @@
-import { IconSearch } from '@assets/svg';
+import { IconSearch, IconTrash } from '@assets/svg';
 import { ItemCollection } from '@components/atoms';
 import Header from '@components/atoms/Header';
 import color from '@config/colors';
+import { COLLECTIONEDIT } from '@config/constrans';
 import stylesGeneral from '@config/stylesGeneral';
 import { useNavigation } from '@react-navigation/native';
-import React, { Component, useEffect } from 'react';
+import { showMusicControl, showTabbar } from '@services/redux/actions';
+import React, { Component, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
-
-const testData = [{
-    id: "1",
-    title: "Download"
-}, {
-    id: "2",
-    title: "Favourist"
-}, {
-    id: "3",
-    title: "Lorem ipsum dolor sit"
-}, {
-    id: "4",
-    title: "Love myself"
-}, {
-    id: "5",
-    title: "DOwnload"
-}, {
-    id: "6",
-    title: "DOwnload"
-}, {
-    id: "7",
-    title: "DOwnload"
-}, {
-    id: "8",
-    title: "DOwnload"
-}, {
-    id: "9",
-    title: "DOwnload"
-}, {
-    id: "10",
-    title: "DOwnload"
-},]
+import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { useSelector, useDispatch } from 'react-redux';
 
 const renderItem = ({ item }) => (
-    <ItemCollection title={item.title} />
+    <ItemCollection name={item.name} thumbnail={item.thumbnail != undefined ? item.thumbnail : ''} id={item.id} />
 );
 
 const Collection = () => {
+    const dispatch = useDispatch()
+    const hiddenTabbar = useSelector((state: any) => state?.hiddenTabbar)
+    const listCollection = useSelector((state: any) => state?.listCollection)
+
+    const [showButtonDone, setShowButtonDone] = useState(false)
 
     return (
         <View style={stylesGeneral.container}>
-            <Header title="Collection" paddingLeft={16} />
+            <Header
+                title="Collection"
+                paddingLeft={16}
+                buttonRight={true}
+                onEdit={() => {
+                    dispatch(showTabbar(true))
+                    setShowButtonDone(true)
+                    dispatch(showMusicControl(false))
+                }}
+                buttonDone={showButtonDone}
+                onDone={() => {
+                    dispatch(showTabbar(false))
+                    setShowButtonDone(false)
+                    dispatch(showMusicControl(true))
+                }}
+            />
 
             <View style={styles.searchBg}>
                 <View style={styles.iconSearchBg}>
@@ -66,13 +57,26 @@ const Collection = () => {
 
             <View style={styles.constainList}>
                 <FlatList
-                    data={testData}
+                    data={listCollection}
                     renderItem={renderItem}
                     keyExtractor={item => item.id}
                     numColumns={2}
                 />
             </View>
 
+            {hiddenTabbar ? (
+                <View style={styles.constainMenu}>
+                    <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonEdit]}>
+                        <Text style={styles.textButtonEdit}>Rename</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonEdit]}>
+                        <Text style={styles.textButtonEdit}>Move</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonDelete]}>
+                        <IconTrash />
+                    </TouchableOpacity>
+                </View>
+            ) : null}
         </View>
     )
 }
@@ -105,7 +109,35 @@ const styles = StyleSheet.create({
         padding: 8,
         marginTop: 8,
         flex: 1,
-    }
+    },
+    constainMenu: {
+        height: 48,
+        marginBottom: 22,
+        zIndex: 1,
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        flexDirection: 'row'
+    },
+    buttonEdit: {
+        height: 48,
+        width: 90,
+        borderRadius: 12,
+        backgroundColor: color.BG_BUTTON,
+        marginHorizontal: 8
+    },
+    textButtonEdit: {
+        fontSize: 16,
+        color: color.TITLE
+    },
+    buttonDelete: {
+        height: 48,
+        width: 48,
+        borderRadius: 12,
+        backgroundColor: color.BG_BUTTON_DELETE,
+        marginLeft: 8,
+        marginRight: 16
+    },
 })
 
 export default Collection;

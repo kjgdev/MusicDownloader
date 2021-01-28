@@ -8,10 +8,13 @@ import PopupDelete from '@components/atoms/PopupDelete';
 import PopupRename from '@components/atoms/PopupRename';
 import PopupCollection from '@components/atoms/PopupCollection';
 import PopupCreateCollect from '@components/atoms/PopupCreateCollect';
+import SQLite from "react-native-sqlite-storage";
 
 const App = () => {
   LogBox.ignoreLogs(['Warning: ...'])
   LogBox.ignoreAllLogs();
+  SQLite.DEBUG(true);
+  SQLite.enablePromise(true);
 
   return (
     <Provider store={store}>

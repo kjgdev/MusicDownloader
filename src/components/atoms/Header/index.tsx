@@ -4,17 +4,25 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-
 const Header = (props: any) => {
     return (
         <View style={[styles.container, { paddingHorizontal: props.paddingLeft }]}>
             <Text style={styles.title}>{props.title}</Text>
+            {props.buttonRight ? (
+                props.buttonDone ?
+                    (<TouchableOpacity
+                        onPress={() => props.onDone()}
+                    >
+                        <Text style={{ fontSize: 16, color: color.TITLE }}>Done</Text>
+                    </TouchableOpacity>) :
+                    (<TouchableOpacity
+                        onPress={() => props.onEdit()}
+                    >
+                        <Text style={{ fontSize: 16, color: color.TITLE }}>Edit</Text>
+                    </TouchableOpacity>)
+            ) : null}
 
-            {props.done && props.buttonRight ? (<TouchableOpacity>
-                <Text style={{ fontSize: 16, color: color.TITLE }}>Done</Text>
-            </TouchableOpacity>) : (<TouchableOpacity>
-                <Text style={{ fontSize: 16, color: color.TITLE }}>Edit</Text>
-            </TouchableOpacity>)}
+
         </View>
     );
 }

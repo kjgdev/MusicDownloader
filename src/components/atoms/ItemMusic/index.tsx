@@ -1,13 +1,22 @@
+import { ImageMusicDefault } from '@assets/images';
 import color from '@config/colors';
 import metric from '@config/metrics';
 import stylesGeneral from '@config/stylesGeneral';
-import React, { Component, useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import React, { Component, useEffect, useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { CheckBox } from 'react-native-elements'
+import MusicControl, { Command } from 'react-native-music-control'
+import Sound from 'react-native-sound'
+import ControlMusic from '../ControlMusic';
 
 const ItemMusic = (props: any) => {
     return (
-        <TouchableOpacity style={styles.constain}>
+        <TouchableOpacity
+            style={[styles.constain]} activeOpacity={0.5}
+            onPress={() => {
+                
+            }}
+        >
             {props.show ? (<View style={{ height: 62 }} >
                 <CheckBox
                     containerStyle={{ padding: 0, justifyContent: 'center', alignItems: "center", flex: 1 }}
@@ -20,10 +29,20 @@ const ItemMusic = (props: any) => {
                     checked={props.checked}
                 />
             </View>) : null}
-            <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center',  borderBottomWidth:1,
-        borderColor:color.LINE }}>
-                <View style={styles.image}></View>
-                <Text style={styles.title}>{props.title}</Text>
+            <View
+                style={{ flexDirection: 'row', borderBottomWidth: 1, alignItems: 'center', flex: 1, borderColor: color.LINE }}
+            >
+                <View style={styles.image}>
+                    <Image
+                        style={styles.image}
+                        source={(props.data.thumbnail != '') ? { uri: props.data.thumbnail } : ImageMusicDefault}
+                    />
+                </View>
+                <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={styles.title}
+                >{props.data.name}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -34,19 +53,19 @@ const styles = StyleSheet.create({
         height: 68,
         width: metric.DEVICE_WIDTH,
         flexDirection: 'row',
-      
+
     },
     image: {
         height: 48,
         width: 48,
-        backgroundColor: 'blue',
         borderRadius: 12,
     },
     title: {
         fontSize: 16,
         fontWeight: 'bold',
         color: color.TITLE,
-        marginLeft: 16
+        marginLeft: 12,
+        marginRight: 80
     }
 })
 

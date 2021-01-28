@@ -1,19 +1,33 @@
-import { IconCheck } from '@assets/svg';
+import { ImageCollectionDefault } from '@assets/images';
 import color from '@config/colors';
+import { LISTMUSIC } from '@config/constrans';
 import metric from '@config/metrics';
 import stylesGeneral from '@config/stylesGeneral';
-import React, { Component } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import React, { Component, useEffect } from 'react';
+import { StyleSheet, View, Text, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const ItemCollection = (item: any) => {
-    return (
-        <TouchableOpacity style={[styles.contain, {}]}>
-            <View style={[styles.containOpacity, stylesGeneral.centerAll]}>
+    const navigation = useNavigation();
 
-            </View>
+    useEffect(()=>{
+        console.log("🚀 ~ file: index.tsx ~ line 12 ~ ItemCollection ~ item", item.id)
+    },[])
+
+    return (
+        <TouchableOpacity
+            style={[styles.contain, {}]}
+            onPress={() => { navigation.navigate(LISTMUSIC,{id:item.id}) }}
+        >
+             <Image
+                style={styles.image}
+                source={(item.thumbnail != '') ? { uri: item.thumbnail } : ImageCollectionDefault}
+            />
+            <View style={[styles.containOpacity, stylesGeneral.centerAll]}></View>
+           
             <Text style={styles.title}>
-                {item.title}
+                {item.name}
             </Text>
 
             {/* <View style={[styles.containClick, stylesGeneral.centerAll]}>
@@ -62,7 +76,12 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
         opacity: 0.8
-    }
+    },
+    image: {
+        height: (metric.DEVICE_WIDTH / 2 - 24),
+        width: (metric.DEVICE_WIDTH / 2 - 24),
+        borderRadius: 12,
+    },
 })
 
 export default ItemCollection;

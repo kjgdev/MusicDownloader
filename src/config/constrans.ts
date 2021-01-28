@@ -11,5 +11,6 @@ export const SETTINGS = 'Settings'
 export const LISTMUSIC = 'ListMusic'
 export const PLAYMUSIC = 'PlayMusic'
 export const COLLECTIONEDIT = 'CollectionEdit'
-export const TABNAVIGATION = 'TabNavigator'
 
+export const COLLECTIONSTACK = "CollectionStack"
+export const TABNAVIGATION = 'TabNavigator'

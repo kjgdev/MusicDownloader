@@ -3,9 +3,11 @@ import Header2 from '@components/atoms/Header2';
 import ItemMusic from '@components/atoms/ItemMusic';
 import color from '@config/colors';
 import stylesGeneral from '@config/stylesGeneral';
-import React, { Component } from 'react';
+import { showTabbar } from '@services/redux/actions';
+import React, { Component, useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
+import { useSelector, useDispatch } from 'react-redux';
 
 const testData = [{
     id: "1",
@@ -42,26 +44,58 @@ const testData = [{
 ]
 
 const renderItem = ({ item }) => (
-    <ItemMusic title={item.title} show={true} checked={false} />
+    <ItemMusic data={item} show={false} checked={true} />
 );
 
+const ListMusic = (props) => {
+    const [showButtonDone, setShowButtonDone] = useState(false)
+    const [paddingBottomFlatlist, setPaddingBottomFlatlist] = useState(10)
+    const dispatch = useDispatch();
+    const listMusic = useSelector((state: any) => state?.listMusic)
 
-const ListMusic = () => {
+    const [listData, setListData] = useState([])
+
+    useEffect(() => {
+        dispatch(showTabbar(true))
+        return () => dispatch(showTabbar(false))
+    }, [])
+
+    useEffect(() => {
+        let data: any[] = []
+        if (listMusic != undefined || listMusic.length > 0) {
+            listMusic.forEach((element: any) => {
+                if (element.id_collection == props.route.params.id) {
+                    data.push(element)
+                }
+            })
+        }
+    }, [listMusic])
+
     return (
         <View style={[stylesGeneral.container]}>
-
-            <Header2 title="Favourist collection" done={true} />
+            <Header2
+                title="Favourist collection"
+                buttonDone={showButtonDone}
+                onEdit={() => {
+                    setShowButtonDone(true)
+                    setPaddingBottomFlatlist(70)
+                }}
+                onDone={() => {
+                    setShowButtonDone(false)
+                    setPaddingBottomFlatlist(10)
+                }}
+            />
             <TouchableOpacity style={[styles.button, stylesGeneral.centerAll]}>
                 <Text style={styles.textButton}>Shuffle Play</Text>
             </TouchableOpacity>
-            <View style={styles.constainList}>
+            <View style={[styles.constainList, { paddingBottom: paddingBottomFlatlist }]}>
                 <FlatList
-                    data={testData}
+                    data={listMusic}
                     renderItem={renderItem}
-                    keyExtractor={item => item.id}
+                    keyExtractor={item => item.id.toString()}
                 />
             </View>
-            <View style={styles.constainMenu}>
+            {showButtonDone ? (<View style={styles.constainMenu}>
                 <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonEdit]}>
                     <Text style={styles.textButtonEdit}>Rename</Text>
                 </TouchableOpacity>
@@ -69,9 +103,9 @@ const ListMusic = () => {
                     <Text style={styles.textButtonEdit}>Move</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonDelete]}>
-                    <IconTrash/>
+                    <IconTrash />
                 </TouchableOpacity>
-            </View>
+            </View>) : null}
         </View>
     );
 }
@@ -93,12 +127,10 @@ const styles = StyleSheet.create({
         flex: 1,
         marginTop: 18,
         marginHorizontal: 16,
-        paddingBottom:80
-
     },
     constainMenu: {
         height: 48,
-        marginBottom: 22,
+        marginBottom: 12,
         zIndex: 1,
         position: 'absolute',
         bottom: 0,

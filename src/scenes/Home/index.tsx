@@ -1,26 +1,27 @@
 import Header from '@components/atoms/Header';
 import color from '@config/colors';
 import stylesGeneral from '@config/stylesGeneral';
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Keyboard } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
-import { IconCheck, IconPaste } from '@assets/svg'
-import LinearGradient from 'react-native-linear-gradient';
-import metric from '@config/metrics';
-import { useSelector, useDispatch } from 'react-redux';
-import { showMusicControl } from '@services/redux/actions';
+import { IconPaste } from '@assets/svg'
+import { useDispatch } from 'react-redux';
+import { fn_GetAPI } from '@services/api';
+import Clipboard from '@react-native-community/clipboard'
 
 const Home = () => {
-    const showMusic = useSelector((state: any) => state?.showMusic)
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        console.log("🚀 ~ file: index.tsx ~ line 14 ~ Home ~ showMusic", showMusic)
+    const [textInputValue, setTextInputValue] = useState('')
 
-    }, [])
+    const fetchCopiedText = async () => {
+        const text = await Clipboard.getString();
+        setTextInputValue(text);
+    }
+
     return (
         <View style={stylesGeneral.container}>
-            <Header title="Download Music" paddingLeft={24} />
+            <Header title="Download Music" paddingLeft={24} buttonRight={false} />
             <View style={styles.cardView}>
                 <Text style={styles.title}>Add Link</Text>
                 <View style={styles.containInput}>
@@ -31,15 +32,28 @@ const Home = () => {
                         selectionColor={color.PLACEHOLDER}
                         multiline={false}
                         numberOfLines={1}
+                        value={textInputValue}
+                        onChangeText={(value) => setTextInputValue(value)}
                     />
-                    <TouchableOpacity style={[stylesGeneral.centerAll, styles.containIconPaste]}
-                        onPress={() => { dispatch(showMusicControl(false)) }}
+                    <TouchableOpacity
+                        style={[stylesGeneral.centerAll, styles.containIconPaste]}
+                        onPress={() => {
+                            Keyboard.dismiss()
+                            fetchCopiedText()
+                        }}
                     >
                         <IconPaste />
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={[stylesGeneral.centerAll, styles.button]}
-                    onPress={() => { dispatch(showMusicControl(true)) }}
+                <TouchableOpacity
+                    style={[stylesGeneral.centerAll, styles.button]}
+                    onPress={() => {
+                        Keyboard.dismiss()
+                        if (textInputValue != '') {
+                            fn_GetAPI(textInputValue, dispatch)
+                            setTextInputValue('')
+                        }
+                    }}
                 >
                     <Text style={{ fontSize: 16, fontWeight: 'bold', color: color.TITLE, }}>Download</Text>
                 </TouchableOpacity>
@@ -94,7 +108,7 @@ const styles = StyleSheet.create({
         height: 46,
         borderRadius: 24,
         marginTop: 16,
-        backgroundColor: 'red'
+        backgroundColor: color.BUTTON_SHUFFLE
     },
 })
 
