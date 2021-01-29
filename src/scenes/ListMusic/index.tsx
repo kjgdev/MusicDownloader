@@ -1,50 +1,20 @@
 import { IconTrash } from '@assets/svg';
 import Header2 from '@components/atoms/Header2';
 import ItemMusic from '@components/atoms/ItemMusic';
+import PopupDelete from '@components/atoms/PopupDelete';
+import PopupRename from '@components/atoms/PopupRename';
+import PopupCollection from '@components/atoms/PopupCollection';
 import color from '@config/colors';
 import stylesGeneral from '@config/stylesGeneral';
-import { showTabbar } from '@services/redux/actions';
+import { setEditMode, showTabbar } from '@services/redux/actions';
 import React, { Component, useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector, useDispatch } from 'react-redux';
-
-const testData = [{
-    id: "1",
-    title: "Download"
-}, {
-    id: "2",
-    title: "Favourist"
-}, {
-    id: "3",
-    title: "Lorem ipsum dolor sit"
-}, {
-    id: "4",
-    title: "Love myself"
-}, {
-    id: "5",
-    title: "DOwnload"
-}, {
-    id: "6",
-    title: "DOwnload"
-}, {
-    id: "7",
-    title: "DOwnload"
-}, {
-    id: "8",
-    title: "DOwnload"
-}, {
-    id: "9",
-    title: "DOwnload"
-}, {
-    id: "10",
-    title: "DOwnload"
-},
-
-]
+import PopupCreateCollect from '@components/atoms/PopupCreateCollect';
 
 const renderItem = ({ item }) => (
-    <ItemMusic data={item} show={false} checked={true} />
+    <ItemMusic data={item} />
 );
 
 const ListMusic = (props) => {
@@ -52,13 +22,36 @@ const ListMusic = (props) => {
     const [paddingBottomFlatlist, setPaddingBottomFlatlist] = useState(10)
     const dispatch = useDispatch();
     const listMusic = useSelector((state: any) => state?.listMusic)
-
-    const [listData, setListData] = useState([])
+    const [showControlEdit, setShowControlEdit] = useState(false)
+    const [showButtonRename, setShowButtonRename] = useState(true)
+    const [listData, setListData] = useState<any[]>([])
+    const listEditMusic = useSelector((state: any) => state?.listEditMusic)
+    const [showPopupRename, setShowPopupRename] = useState(false)
+    const [showPopupDelete, setShowPopupDelete] = useState(false)
+    const [showPopupCollection, setShowPopupCollection] = useState(false)
+    const editMode = useSelector((state: any) => state?.editMode)
+    const [showCreateCollection, setShowCreateCollection] = useState(false)
 
     useEffect(() => {
         dispatch(showTabbar(true))
-        return () => dispatch(showTabbar(false))
+        return () => {
+            dispatch(showTabbar(false))
+            dispatch(setEditMode(false))
+        }
     }, [])
+
+    useEffect(() => {
+        if (listEditMusic.length > 1) {
+            setShowButtonRename(false)
+        }
+        else if (listEditMusic.length > 0) {
+            setShowControlEdit(true)
+            setShowButtonRename(true)
+        }
+        else {
+            setShowControlEdit(false)
+        }
+    }, [listEditMusic])
 
     useEffect(() => {
         let data: any[] = []
@@ -69,40 +62,84 @@ const ListMusic = (props) => {
                 }
             })
         }
+        setListData(data)
     }, [listMusic])
 
     return (
         <View style={[stylesGeneral.container]}>
             <Header2
-                title="Favourist collection"
+                title={editMode ? "Edit Music" : `${props.route.params.name} Collection`}
+                buttonLeft={editMode ? null : true}
                 buttonDone={showButtonDone}
                 onEdit={() => {
                     setShowButtonDone(true)
                     setPaddingBottomFlatlist(70)
+                    dispatch(setEditMode(true))
                 }}
                 onDone={() => {
                     setShowButtonDone(false)
                     setPaddingBottomFlatlist(10)
+                    dispatch(setEditMode(false))
                 }}
             />
-            <TouchableOpacity style={[styles.button, stylesGeneral.centerAll]}>
+            <PopupRename
+                visiable={showPopupRename}
+                data={listEditMusic[0]}
+                type={2}
+                setVisiable={setShowPopupRename}
+            />
+
+            <PopupDelete
+                visiable={showPopupDelete}
+                data={listEditMusic}
+                type={2}
+                setVisiable={setShowPopupDelete}
+            />
+
+            <PopupCollection
+                visiable={showPopupCollection}
+                setVisiable={setShowPopupCollection}
+                data={listEditMusic}
+                setVisiableCreate={setShowCreateCollection}
+            />
+
+            <PopupCreateCollect
+                visiable={showCreateCollection}
+                setVisiable={setShowCreateCollection}
+            />
+
+            {!editMode ? (<TouchableOpacity style={[styles.button, stylesGeneral.centerAll]}>
                 <Text style={styles.textButton}>Shuffle Play</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>) : null}
+
             <View style={[styles.constainList, { paddingBottom: paddingBottomFlatlist }]}>
                 <FlatList
-                    data={listMusic}
+                    data={listData}
                     renderItem={renderItem}
                     keyExtractor={item => item.id.toString()}
                 />
             </View>
-            {showButtonDone ? (<View style={styles.constainMenu}>
-                <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonEdit]}>
-                    <Text style={styles.textButtonEdit}>Rename</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonEdit]}>
+            {showControlEdit ? (<View style={styles.constainMenu}>
+                {showButtonRename ? (<TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonEdit]}>
+                    <Text
+                        style={styles.textButtonEdit}
+                        onPress={() => { setShowPopupRename(true) }}
+                    >Rename</Text>
+                </TouchableOpacity>) : null}
+                <TouchableOpacity
+                    style={[stylesGeneral.centerAll, styles.buttonEdit]}
+                    onPress={() => {
+                        setShowPopupCollection(true)
+                    }}
+                >
                     <Text style={styles.textButtonEdit}>Move</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonDelete]}>
+                <TouchableOpacity
+                    style={[stylesGeneral.centerAll, styles.buttonDelete]}
+                    onPress={() => {
+                        setShowPopupDelete(true)
+                    }}
+                >
                     <IconTrash />
                 </TouchableOpacity>
             </View>) : null}

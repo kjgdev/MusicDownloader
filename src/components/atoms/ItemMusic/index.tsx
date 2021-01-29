@@ -8,16 +8,76 @@ import { CheckBox } from 'react-native-elements'
 import MusicControl, { Command } from 'react-native-music-control'
 import Sound from 'react-native-sound'
 import ControlMusic from '../ControlMusic';
+import { useSelector, useDispatch } from 'react-redux';
+import { addItemMusicEdit, removeItemMusicEdit } from '@services/redux/actions';
 
-const ItemMusic = (props: any) => {
+const ItemMusic = (item: any) => {
+    const editMode = useSelector((state: any) => state?.editMode)
+    const [select, setSelect] = useState(false);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (select) {
+            dispatch(addItemMusicEdit(item.data))
+        }
+        else {
+            dispatch(removeItemMusicEdit(item.data))
+        }
+    }, [select])
+
     return (
         <TouchableOpacity
             style={[styles.constain]} activeOpacity={0.5}
             onPress={() => {
-                
+                if (editMode) {
+                    setSelect(!select)
+                }
+                else {
+                    console.log(item)
+                    var whoosh = new Sound(item.data.path, Sound.MAIN_BUNDLE, (error) => {
+                        if (error) {
+                            console.log('failed to load the sound', error);
+                            return;
+                        }
+                        console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+                        whoosh.play((success) => {
+                            if (success) {
+                                console.log('successfully finished playing');
+                            } else {
+                                console.log('playback failed due to audio decoding errors');
+                            }
+                        });
+
+                        // Reduce the volume by half
+                        whoosh.setVolume(0.5);
+
+                        // Seek to a specific point in seconds
+                        whoosh.setCurrentTime(0);
+                    })
+
+                    MusicControl.setNowPlaying({
+                        title: 'Billie Jean',
+                        artwork: item.data.thumbnail, // URL or RN's image require()
+                        artist: 'Michael Jackson',
+                        album: 'Thriller',
+                        genre: 'Post-disco, Rhythm and Blues, Funk, Dance-pop',
+                        duration:  whoosh.getDuration(), // (Seconds)
+                        description: '', // Android Only
+                        color: 0xffffff, // Android Only - Notification Color
+                        colorized: true, // Android 8+ Only - Notification Color extracted from the artwork. Set to false to use the color property instead
+                        notificationIcon: 'my_custom_icon', // Android Only (String), Android Drawable resource name for a custom notification icon
+                    })
+
+                    // Basic Controls
+                    MusicControl.enableControl('play', true)
+                    MusicControl.enableControl('pause', true)
+                    MusicControl.enableControl('stop', false)
+                    MusicControl.enableControl('nextTrack', true)
+                    MusicControl.enableControl('previousTrack', false)
+                }
             }}
         >
-            {props.show ? (<View style={{ height: 62 }} >
+            {editMode ? (<View style={{ height: 62 }} >
                 <CheckBox
                     containerStyle={{ padding: 0, justifyContent: 'center', alignItems: "center", flex: 1 }}
                     iconRight
@@ -26,7 +86,12 @@ const ItemMusic = (props: any) => {
                     checkedColor={color.CHECKBOX_CHECK}
                     checkedIcon='dot-circle-o'
                     uncheckedIcon='circle-o'
-                    checked={props.checked}
+                    checked={select}
+                    onPress={() => {
+                        if (editMode) {
+                            setSelect(!select)
+                        }
+                    }}
                 />
             </View>) : null}
             <View
@@ -35,14 +100,14 @@ const ItemMusic = (props: any) => {
                 <View style={styles.image}>
                     <Image
                         style={styles.image}
-                        source={(props.data.thumbnail != '') ? { uri: props.data.thumbnail } : ImageMusicDefault}
+                        source={(item?.data.thumbnail != '') ? { uri: item?.data.thumbnail } : ImageMusicDefault}
                     />
                 </View>
                 <Text
                     numberOfLines={2}
                     ellipsizeMode="tail"
                     style={styles.title}
-                >{props.data.name}</Text>
+                >{item.data.name}</Text>
             </View>
         </TouchableOpacity>
     );

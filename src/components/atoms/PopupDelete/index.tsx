@@ -1,21 +1,27 @@
 import { IconClose } from '@assets/svg';
 import color from '@config/colors';
 import metric from '@config/metrics';
+import { loadCollection, loadMusic } from '@services/redux/actions';
+import { dboCollection, dboMusic } from '@services/sqlite';
 import React, { Component, useState } from 'react';
 import { View, Modal, StyleSheet, Alert, Text, TouchableOpacity, TextInput, TouchableHighlight } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 
 interface PopupConfig {
-  visiable: boolean
+  visiable: boolean,
+  data: any,
+  type: number,
+  setVisiable: any
 }
 
 const PopupDelete = (props: PopupConfig) => {
-  const [visiable, setVisiable] = useState(props.visiable)
+  const dispatch = useDispatch()
 
   return (
     <Modal
       animationType="fade"
       transparent={true}
-      visible={visiable}
+      visible={props.visiable}
       onRequestClose={() => {
         Alert.alert("Modal has been closed.");
       }}
@@ -23,7 +29,7 @@ const PopupDelete = (props: PopupConfig) => {
       <View style={styles.constrainOpacity}></View>
       <TouchableOpacity
         style={styles.centeredView}
-        onPress={() => { setVisiable(false) }}
+        onPress={() => { props.setVisiable(false) }}
         activeOpacity={1}
       >
         <View style={styles.modalView}>
@@ -38,11 +44,42 @@ const PopupDelete = (props: PopupConfig) => {
           <View style={{ justifyContent: 'flex-end', flexDirection: 'row', marginTop: 30 }}>
             <TouchableOpacity
               style={[styles.button, { backgroundColor: color.BG_CARD }]}
-              onPress={() => { setVisiable(false) }}
+              onPress={() => { props.setVisiable(false) }}
             >
-              <Text style={{ fontSize: 16, color: color.TITLE }}>Cancle</Text>
+              <Text
+                style={{ fontSize: 16, color: color.TITLE }}
+                onPress={() => { props.setVisiable(false) }}
+              >Cancle</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={async () => {
+                for (let i = 0; i < props.data.length; i++) {
+                  let index = i;
+                  if (props.type == 1) {
+                    dboCollection.DeleteItem(props.data[i].id).then(() => {
+                      if (index == props.data.length - 1) {
+                        dboCollection.SelectAll().then((res: any) => {
+                          dispatch(loadCollection(res))
+                          props.setVisiable(false)
+                        })
+                      }
+                    })
+                  }
+                  else if (props.type == 2) {
+                    dboMusic.DeleteItem(props.data[i].id,props.data[i].path).then(() => {
+                      if (index == props.data.length - 1) {
+                        dboMusic.SelectAll().then((res: any) => {
+                          dispatch(loadMusic(res))
+                          props.setVisiable(false)
+                        })
+                      }
+                    })
+                  }
+                }
+
+              }}
+            >
               <Text style={{ fontSize: 16, color: color.TITLE }}>Done</Text>
             </TouchableOpacity>
 

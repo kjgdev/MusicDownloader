@@ -1,11 +1,15 @@
 import { IconSearch, IconTrash } from '@assets/svg';
 import { ItemCollection } from '@components/atoms';
 import Header from '@components/atoms/Header';
+import PopupDelete from '@components/atoms/PopupDelete';
+import PopupRename from '@components/atoms/PopupRename';
 import color from '@config/colors';
 import { COLLECTIONEDIT } from '@config/constrans';
 import stylesGeneral from '@config/stylesGeneral';
 import { useNavigation } from '@react-navigation/native';
-import { showMusicControl, showTabbar } from '@services/redux/actions';
+import { loadCollection, setEditMode, showMusicControl, showPopupRename, showTabbar } from '@services/redux/actions';
+import { dboCollection } from '@services/sqlite';
+import { isDuration } from 'moment';
 import React, { Component, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
@@ -17,28 +21,60 @@ const renderItem = ({ item }) => (
 
 const Collection = () => {
     const dispatch = useDispatch()
-    const hiddenTabbar = useSelector((state: any) => state?.hiddenTabbar)
+    const editMode = useSelector((state: any) => state?.editMode)
     const listCollection = useSelector((state: any) => state?.listCollection)
-
+    const showMusic = useSelector((state: any) => state?.showMusic)
+    const listCollectionEdit = useSelector((state: any) => state?.listCollectionEdit)
     const [showButtonDone, setShowButtonDone] = useState(false)
+    const [showButtonRename, setShowButtonRename] = useState(true)
+    const [showControlEdit, setShowControlEdit] = useState(false)
+    const [showPopupRename, setShowPopupRename] = useState(false)
+    const [showPopupDelete, setShowPopupDelete] = useState(false)
+
+    useEffect(() => {
+        if (listCollectionEdit != undefined) {
+            if (listCollectionEdit.length > 1) {
+                setShowButtonRename(false)
+            }
+            else if (listCollectionEdit.length > 0) {
+                setShowControlEdit(true)
+                setShowButtonRename(true)
+            }
+            else {
+                setShowControlEdit(false)
+            }
+        }
+    }, [listCollectionEdit])
 
     return (
         <View style={stylesGeneral.container}>
+
             <Header
-                title="Collection"
+                title={editMode? "Edit Collection" : "Collection"}
                 paddingLeft={16}
                 buttonRight={true}
                 onEdit={() => {
-                    dispatch(showTabbar(true))
+                    dispatch(setEditMode(true))
                     setShowButtonDone(true)
-                    dispatch(showMusicControl(false))
                 }}
                 buttonDone={showButtonDone}
                 onDone={() => {
-                    dispatch(showTabbar(false))
+                    dispatch(setEditMode(false))
                     setShowButtonDone(false)
-                    dispatch(showMusicControl(true))
                 }}
+            />
+            <PopupRename
+                visiable={showPopupRename}
+                data={listCollectionEdit[0]}
+                type={1}
+                setVisiable={setShowPopupRename}
+            />
+
+            <PopupDelete
+                visiable={showPopupDelete}
+                data={listCollectionEdit}
+                type={1}
+                setVisiable={setShowPopupDelete}
             />
 
             <View style={styles.searchBg}>
@@ -64,15 +100,22 @@ const Collection = () => {
                 />
             </View>
 
-            {hiddenTabbar ? (
+            {showControlEdit ? (
                 <View style={styles.constainMenu}>
-                    <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonEdit]}>
-                        <Text style={styles.textButtonEdit}>Rename</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonEdit]}>
-                        <Text style={styles.textButtonEdit}>Move</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonDelete]}>
+                    {showButtonRename ?
+                        (<TouchableOpacity
+                            style={[stylesGeneral.centerAll, styles.buttonEdit]}
+                            onPress={() => {
+                                setShowPopupRename(true)
+                            }}>
+                            <Text style={styles.textButtonEdit}>Rename</Text>
+                        </TouchableOpacity>) : null}
+                    <TouchableOpacity
+                        style={[stylesGeneral.centerAll, styles.buttonDelete]}
+                        onPress={() => {
+                            setShowPopupDelete(true)
+                        }}
+                    >
                         <IconTrash />
                     </TouchableOpacity>
                 </View>

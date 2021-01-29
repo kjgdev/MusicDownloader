@@ -3,13 +3,17 @@ import metric from '@config/metrics';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useSelector, useDispatch } from 'react-redux';
 
 const Header = (props: any) => {
+
+    const editMode = useSelector((state: any) => state?.editMode)
+
     return (
         <View style={[styles.container, { paddingHorizontal: props.paddingLeft }]}>
             <Text style={styles.title}>{props.title}</Text>
             {props.buttonRight ? (
-                props.buttonDone ?
+                editMode ?
                     (<TouchableOpacity
                         onPress={() => props.onDone()}
                     >
@@ -21,8 +25,6 @@ const Header = (props: any) => {
                         <Text style={{ fontSize: 16, color: color.TITLE }}>Edit</Text>
                     </TouchableOpacity>)
             ) : null}
-
-
         </View>
     );
 }

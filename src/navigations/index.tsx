@@ -58,7 +58,6 @@ const Navigator = () => {
                 setFirstLoad(false)
             }
         })
-        loadData()
     }, [])
 
     const loadData = () => {
@@ -74,17 +73,39 @@ const Navigator = () => {
         return null;
     }
     else if (firstLoad == true) {
-        dboCollection.CreateTable().then((res: any) => {
+        let task1 = dboCollection.CreateTable().then((res: any) => {
+        })
+        let task2 = dboCollection.InsertItem({ name: "Download", thumbnail: "" }).then((res: any) => {
             if (res.status == 200) {
-                dboCollection.InsertItem({ name: "Download", thumbnail: "" }).then((res: any) => {
-                    if (res.status == 200) {
-                        console.log('Insert collection success')
-                    }
-                })
+                console.log('Insert collection success')
             }
         })
-        dboMusic.CreateTable().then((res: any) => {
+        let task3 = dboCollection.InsertItem({ name: "Favourist", thumbnail: "" }).then((res: any) => {
+            if (res.status == 200) {
+                console.log('Insert collection success')
+            }
+        })
+        let task4 = dboCollection.InsertItem({ name: "Test 1", thumbnail: "" }).then((res: any) => {
+            if (res.status == 200) {
+                console.log('Insert collection success')
+            }
+        })
+        let task5 = dboCollection.InsertItem({ name: "Test 2", thumbnail: "" }).then((res: any) => {
+            if (res.status == 200) {
+                console.log('Insert collection success')
+            }
+        })
+        let task6 = dboCollection.InsertItem({ name: "Test 3", thumbnail: "" }).then((res: any) => {
+            if (res.status == 200) {
+                console.log('Insert collection success')
+            }
+        })
+        let task7 = dboMusic.CreateTable().then((res: any) => {
             if (res.status == 200) console.log('Create table music success')
+        })
+
+        Promise.all([task1, task2, task3, task4, task5, task6, task7]).then(() => {
+            loadData()
         })
 
         return (
@@ -96,6 +117,7 @@ const Navigator = () => {
         )
     }
     else {
+        loadData()
         return (
             <NavigationContainer>
                 <Stack.Navigator initialRouteName={TABNAVIGATION} headerMode="none"  >

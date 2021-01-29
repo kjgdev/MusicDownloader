@@ -5,19 +5,22 @@ import { useNavigation } from '@react-navigation/native';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useSelector, useDispatch } from 'react-redux';
 
 const Header2 = (props: any) => {
     const navigation = useNavigation();
+    const editMode = useSelector((state: any) => state?.editMode)
 
     return (
         <View style={[styles.container]}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            {props.buttonLeft? (  <TouchableOpacity onPress={() => navigation.goBack()}>
                 <IconBack />
-            </TouchableOpacity>
+            </TouchableOpacity>):null}
+          
 
             <Text style={styles.title}>{props.title}</Text>
 
-            {props.buttonDone ?
+            {editMode ?
                 (<TouchableOpacity onPress={() => props.onDone()}>
                     <Text style={{ fontSize: 16, color: color.TITLE }} >Done</Text>
                 </TouchableOpacity>)

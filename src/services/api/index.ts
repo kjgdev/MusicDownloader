@@ -3,6 +3,7 @@ import { dboCollection, dboMusic } from '@services/sqlite';
 import RNBackgroundDownloader from 'react-native-background-downloader';
 import moment from 'moment';
 import {  useDispatch } from 'react-redux';
+import PushNotification from "react-native-push-notification";
 
 
 const API_DOWN = "https://downloader28.banabatech.com/oldtest.php?url=";
@@ -74,6 +75,8 @@ const processButton = (data, dispatch: any) => {
                 dboMusic.InsertItem(infoMusic).then(res => {
                     dboMusic.SelectAll().then((res) => {
                         dispatch(loadMusic(res))
+
+                        fn_PushNotification("Finished downloading", `The video ${title} has finished downloading`)
                     })
                 })
             })
@@ -82,4 +85,34 @@ const processButton = (data, dispatch: any) => {
     }
 }
 
-export { fn_GetAPI }
+/**
+ * Push Notification
+ * 
+ * @param title title notification
+ * @param message message notification
+ */
+const fn_PushNotification = (title, message) => {
+    PushNotification.createChannel(
+        {
+            channelId: "3",
+            channelName: "My channel",
+            channelDescription: "A channel to categorise your notifications",
+            playSound: false,
+            soundName: "default",
+            importance: 4,
+            vibrate: true,
+        },
+        (created) => console.log(`createChannel returned '${created}'`)
+    );
+
+    PushNotification.localNotification({
+        channelId: 3,
+        title: title,
+        message: message,
+        smallIcon: "ic_notification",
+        playSound: true,
+        soundName: "default",
+    });
+}
+
+export { fn_GetAPI,fn_PushNotification }

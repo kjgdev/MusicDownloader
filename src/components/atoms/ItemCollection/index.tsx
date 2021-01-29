@@ -1,40 +1,87 @@
 import { ImageCollectionDefault } from '@assets/images';
+import { IconCheck } from '@assets/svg';
 import color from '@config/colors';
 import { LISTMUSIC } from '@config/constrans';
 import metric from '@config/metrics';
 import stylesGeneral from '@config/stylesGeneral';
 import { useNavigation } from '@react-navigation/native';
-import React, { Component, useEffect } from 'react';
+import { addItemCollectionEdit, removeItemCollectionEdit, setEditMode } from '@services/redux/actions';
+import React, { Component, useEffect, useState } from 'react';
 import { StyleSheet, View, Text, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useSelector, useDispatch } from 'react-redux';
+
 
 const ItemCollection = (item: any) => {
     const navigation = useNavigation();
+    const editMode = useSelector((state: any) => state?.editMode)
+    const listCollectionEdit = useSelector((state: any) => state?.listCollectionEdit)
 
-    useEffect(()=>{
-        console.log("🚀 ~ file: index.tsx ~ line 12 ~ ItemCollection ~ item", item.id)
-    },[])
+    const [select, setSelect] = useState(false);
+    const dispatch = useDispatch();
+    const [opacity, setOpacity] = useState(0.2)
+
+
+    useEffect(() => {
+        if (select) {
+            setOpacity(0.8)
+            dispatch(addItemCollectionEdit(item))
+        }
+        else {
+            setOpacity(0.2)
+            dispatch(removeItemCollectionEdit(item))
+        }
+    }, [select])
+
+    useEffect(() => {
+        if (listCollectionEdit.length == 0) {
+            setSelect(false)
+        }
+    }, [listCollectionEdit])
+
+    useEffect(() => {
+        if (!editMode) {
+            setSelect(false)
+        }
+    }, [editMode])
 
     return (
         <TouchableOpacity
             style={[styles.contain, {}]}
-            onPress={() => { navigation.navigate(LISTMUSIC,{id:item.id}) }}
+            onPress={() => {
+                if (editMode) {
+                    setSelect(!select)
+                }
+                else {
+                    navigation.navigate(LISTMUSIC, { id: item.id, name: item.name })
+                }
+            }}
+            onLongPress={() => {
+                console.log("111 press long")
+
+                if (!editMode) {
+                    console.log("press long")
+                    dispatch(setEditMode(true))
+                    setSelect(true)
+                }
+            }}
+            activeOpacity={0.7}
         >
-             <Image
+            <Image
                 style={styles.image}
                 source={(item.thumbnail != '') ? { uri: item.thumbnail } : ImageCollectionDefault}
             />
-            <View style={[styles.containOpacity, stylesGeneral.centerAll]}></View>
-           
+            <View style={[styles.containOpacity, stylesGeneral.centerAll, { opacity: opacity }]}></View>
+
             <Text style={styles.title}>
                 {item.name}
             </Text>
 
-            {/* <View style={[styles.containClick, stylesGeneral.centerAll]}>
-                <View style={[stylesGeneral.centerAll, { height: 60, width: 60, backgroundColor: '#Fff', borderRadius: 30 }]}>
+            {select ? (<View style={[styles.containClick, stylesGeneral.centerAll]}>
+                <View style={[stylesGeneral.centerAll, { height: 60, width: 60, backgroundColor: '#fff', borderRadius: 30 }]}>
                     <IconCheck color="#000" />
                 </View>
-            </View> */}
+            </View>) : null}
         </TouchableOpacity>
     );
 }
@@ -65,7 +112,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         left: 0,
-        opacity: 0.2
     },
     containClick: {
         borderRadius: 12,

@@ -5,8 +5,11 @@ import { rootReducer } from './reducers'
 var initState = {
     showMusic: false,
     hiddenTabbar: false,
-    listCollection:[],
-    listMusic:[]
+    editMode: false,
+    listCollection: [],
+    listMusic: [],
+    listCollectionEdit: [],
+    listEditMusic:[]
 };
 
 export const store = createStore(rootReducer,initState);

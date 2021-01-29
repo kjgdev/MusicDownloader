@@ -1,4 +1,17 @@
-import { SHOW_CONTROL_MUSIC, HIDDEN_TABBAR, LOAD_COLLECTION, LOAD_MUSIC } from './constrans';
+import {
+     SHOW_CONTROL_MUSIC,
+      HIDDEN_TABBAR, 
+      LOAD_COLLECTION, 
+      LOAD_MUSIC, 
+      EDIT_MODE, 
+      ADD_ITEM_COLL_EDIT, 
+      REMOVE_ITEM_COLL_EDIT,
+       ADD_ITEM_MUSIC_EDIT, 
+       REMOVE_ITEM_MUSIC_EDIT, 
+       SHOW_POPUP_RENAME,
+       RESET_EDIT,
+    
+    } from './constrans';
 
 export const showMusicControl = (status: boolean) => {
     return {
@@ -7,9 +20,23 @@ export const showMusicControl = (status: boolean) => {
     }
 }
 
+export const showPopupRename = (status: boolean) => {
+    return {
+        type: SHOW_POPUP_RENAME,
+        payload: status
+    }
+}
+
 export const showTabbar = (status: boolean) => {
     return {
         type: HIDDEN_TABBAR,
+        payload: status
+    }
+}
+
+export const setEditMode = (status: boolean) => {
+    return {
+        type: EDIT_MODE,
         payload: status
     }
 }
@@ -25,5 +52,39 @@ export const loadMusic = (data) => {
     return {
         type: LOAD_MUSIC,
         payload: data
+    }
+}
+
+export const addItemCollectionEdit = (data) => {
+    return {
+        type: ADD_ITEM_COLL_EDIT,
+        payload: data
+    }
+}
+
+export const removeItemCollectionEdit = (data) => {
+    return {
+        type: REMOVE_ITEM_COLL_EDIT,
+        payload: data
+    }
+}
+
+export const addItemMusicEdit = (data) => {
+    return {
+        type: ADD_ITEM_MUSIC_EDIT,
+        payload: data
+    }
+}
+
+export const removeItemMusicEdit = (data) => {
+    return {
+        type: REMOVE_ITEM_MUSIC_EDIT,
+        payload: data
+    }
+}
+
+export const resetEdit = () => {
+    return {
+        type: RESET_EDIT
     }
 }

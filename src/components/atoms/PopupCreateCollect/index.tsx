@@ -1,29 +1,33 @@
 import { IconClose } from '@assets/svg';
 import color from '@config/colors';
 import metric from '@config/metrics';
+import { loadCollection, loadMusic } from '@services/redux/actions';
+import { dboCollection, dboMusic } from '@services/sqlite';
 import React, { Component, useState } from 'react';
 import { View, Modal, StyleSheet, Alert, Text, TouchableOpacity, TextInput } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 
 interface PopupConfig {
-    visiable: boolean
+    visiable: boolean,
+    setVisiable: any
 }
 
+
 const PopupCreateCollect = (props: PopupConfig) => {
-    const [visiable, setVisiable] = useState(props.visiable)
+    const [textInputValue, setTextInputValue] = useState("")
+    const listEditMusic = useSelector((state: any) => state?.listEditMusic)
+    const dispatch = useDispatch();
 
     return (
         <Modal
             animationType="fade"
             transparent={true}
-            visible={visiable}
-            onRequestClose={() => {
-                Alert.alert("Modal has been closed.");
-            }}
+            visible={props.visiable}
         >
             <View style={styles.constrainOpacity}></View>
             <TouchableOpacity
                 style={styles.centeredView}
-                onPress={() => { setVisiable(false) }}
+                onPress={() => { props.setVisiable(false) }}
                 activeOpacity={1}
             >
                 <View style={styles.modalView}>
@@ -41,15 +45,38 @@ const PopupCreateCollect = (props: PopupConfig) => {
                         selectionColor={color.PLACEHOLDER}
                         multiline={false}
                         numberOfLines={1}
+                        value={textInputValue}
+                        onChangeText={(value) => setTextInputValue(value)}
                     />
                     <View style={{ justifyContent: 'flex-end', flexDirection: 'row', }}>
                         <TouchableOpacity
                             style={[styles.button, { backgroundColor: color.BG_CARD }]}
-                            onPress={() => { setVisiable(false) }}
+                            onPress={() => { props.setVisiable(false) }}
                         >
                             <Text style={{ fontSize: 16, color: color.TITLE }}>Cancle</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.button}>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => {
+                                console.log(textInputValue)
+                                dboCollection.InsertItem({ name: textInputValue, thumbnail: "" }).then((res: any) => {
+                                    if (res.status == 200) {
+                                        dboCollection.SelectAll().then((res: any) => {
+                                            dispatch(loadCollection(res))
+                                        })
+                                        for (let i = 0; i < listEditMusic.length; i++) {
+                                            let index = i;
+                                            dboMusic.MoveCollection(listEditMusic[index].id, res.data[0].insertId).then(() => {
+                                                dboMusic.SelectAll().then((res: any) => {
+                                                    dispatch(loadMusic(res))
+                                                    props.setVisiable(false)
+                                                })
+                                            })
+                                        }
+                                    }
+                                })
+                            }}
+                        >
                             <Text style={{ fontSize: 16, color: color.TITLE }}>Done</Text>
                         </TouchableOpacity>
 

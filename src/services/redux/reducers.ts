@@ -1,37 +1,95 @@
-import { HIDDEN_TABBAR, SHOW_CONTROL_MUSIC, LOAD_COLLECTION, LOAD_MUSIC } from './constrans';
+import { ListMusic } from '@scenes';
+import { HIDDEN_TABBAR, SHOW_CONTROL_MUSIC, LOAD_COLLECTION, LOAD_MUSIC, EDIT_MODE, ADD_ITEM_COLL_EDIT, REMOVE_ITEM_COLL_EDIT, ADD_ITEM_MUSIC_EDIT, REMOVE_ITEM_MUSIC_EDIT, SHOW_POPUP_RENAME, RESET_EDIT } from './constrans';
 
 var initState = {
     showMusic: false,
     hiddenTabbar: false,
-    listCollection:[],
-    listMusic:[]
+    editMode: false,
+    listCollection: [],
+    listMusic: [],
+    listCollectionEdit: [],
+    listEditMusic:[],
+    popupRename:false,
 };
 
 export const rootReducer = (state: any = initState, action: any) => {
     switch (action.type) {
-        case SHOW_CONTROL_MUSIC:{
+        case SHOW_CONTROL_MUSIC: {
             return {
                 ...state,
-                showMusic:action.payload
+                showMusic: action.payload
             }
         }
-        case HIDDEN_TABBAR:{
+        case SHOW_POPUP_RENAME: {
             return {
                 ...state,
-                hiddenTabbar:action.payload
+                popupRename: action.payload
             }
         }
-        case LOAD_COLLECTION:{
+        case HIDDEN_TABBAR: {
             return {
                 ...state,
-                listCollection:action.payload
+                hiddenTabbar: action.payload
             }
         }
-        case LOAD_MUSIC:{
+        case LOAD_COLLECTION: {
             return {
                 ...state,
-                listMusic:action.payload
+                listCollection: action.payload,
+                listCollectionEdit:[]
             }
         }
+        case LOAD_MUSIC: {
+            return {
+                ...state,
+                listMusic: action.payload
+            }
+        }
+        case EDIT_MODE: {
+            return {
+                ...state,
+                editMode: action.payload,
+                listCollectionEdit:[],
+                listEditMusic:[]
+            }
+        }
+        case ADD_ITEM_COLL_EDIT: {
+            return {
+                ...state,
+                listCollectionEdit: [
+                    ...state.listCollectionEdit,
+                    action.payload
+                ]
+            }
+        }
+        case REMOVE_ITEM_COLL_EDIT: {
+            return {
+                ...state,
+                listCollectionEdit: state.listCollectionEdit.filter(item => item.id !== action.payload.id)
+            }
+        }
+        case ADD_ITEM_MUSIC_EDIT: {
+            return {
+                ...state,
+                listEditMusic: [
+                    ...state.listEditMusic,
+                    action.payload
+                ]
+            }
+        }
+        case REMOVE_ITEM_MUSIC_EDIT: {
+            return {
+                ...state,
+                listEditMusic: state.listEditMusic.filter(item => item.id !== action.payload.id)
+            }
+        }
+        case RESET_EDIT: {
+            return {
+                ...state,
+                listEditMusic: [],
+                listCollectionEdit:[]
+            }
+        }
+
     }
 }

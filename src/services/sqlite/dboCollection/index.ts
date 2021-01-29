@@ -1,4 +1,5 @@
 import SQLite from "react-native-sqlite-storage";
+import dboMusic from "../dboMusic";
 const DATABASE_NAME = 'data.db';
 
 
@@ -33,8 +34,8 @@ const InsertItem = (props: CollectionTable) => {
         SQLite.openDatabase({ name: DATABASE_NAME })
             .then((res) => {
                 res.executeSql(query, [props.name, props.thumbnail])
-                    .then(() => {
-                        resolve({ status: 200 })
+                    .then((res) => {
+                        resolve({ status: 200, data: res })
                     })
                     .catch(() => {
                         reject({ status: 500, error: "Error insert database" })
@@ -71,10 +72,56 @@ const SelectAll = () => {
     })
 }
 
+const Rename = (name: String, id: number) => {
+    let query = 'UPDATE Collection SET name = ? WHERE ID = ?;';
+    return new Promise((resolve, reject) => {
+        SQLite.openDatabase({ name: DATABASE_NAME })
+            .then((res) => {
+                res.executeSql(query, [name, id])
+                    .then(() => {
+                        resolve({ status: 200 })
+                    })
+                    .catch(() => {
+                        reject({ status: 500, error: "Error insert database" })
+                    })
+            })
+            .catch(() => {
+                reject({ status: 500, error: "Error insert database" })
+            })
+    })
+}
+
+const DeleteItem = (id: number) => {
+    if (id != 1) {
+        let query = 'DELETE FROM Collection WHERE ID = ?;';
+        return new Promise((resolve, reject) => {
+            SQLite.openDatabase({ name: DATABASE_NAME })
+                .then((res) => {
+                    res.executeSql(query, [id])
+                        .then(() => {
+                            resolve({ status: 200 })
+                            dboMusic.DeleteItemByCollectionID(id)
+                        })
+                        .catch(() => {
+                            reject({ status: 500, error: "Error insert database" })
+                        })
+                })
+                .catch(() => {
+                    reject({ status: 500, error: "Error insert database" })
+                })
+        })
+    }
+    return new Promise((resolve, reject) => {
+        resolve(500)
+    })
+}
+
 const dboCollection = {
     InsertItem,
     SelectAll,
-    CreateTable
+    CreateTable,
+    Rename,
+    DeleteItem
 }
 
 export default dboCollection;

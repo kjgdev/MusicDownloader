@@ -6,7 +6,7 @@ import { View, Text, StyleSheet, Keyboard } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { IconPaste } from '@assets/svg'
 import { useDispatch } from 'react-redux';
-import { fn_GetAPI } from '@services/api';
+import { fn_GetAPI, fn_PushNotification } from '@services/api';
 import Clipboard from '@react-native-community/clipboard'
 
 const Home = () => {

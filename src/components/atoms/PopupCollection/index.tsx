@@ -1,99 +1,89 @@
 import { IconClose, IconPlus } from '@assets/svg';
 import color from '@config/colors';
 import metric from '@config/metrics';
-import React, { Component, useState } from 'react';
-import { View, Modal, StyleSheet, Alert, Text, TouchableOpacity, TextInput, TouchableHighlight, KeyboardAvoidingView } from 'react-native';
+import React, { Component, useEffect, useState } from 'react';
+import { View, Modal, StyleSheet, Alert, Text, TouchableOpacity, TextInput, TouchableHighlight, KeyboardAvoidingView, Image } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
+import ItemCollectionOnPopup from '../ItemCollectionOnPopup';
 import ItemMusic from '../ItemMusic';
 import Search from '../Search';
+import { useSelector, useDispatch } from 'react-redux';
+import { ImageMusicDefault } from '@assets/images';
+
 
 interface PopupConfig {
-    visiable: boolean
+    visiable: boolean,
+    setVisiable: any,
+    data: any,
+    setVisiableCreate:any
 }
 
-let defaultProps: PopupConfig = {
-    visiable: true
-}
+const PopupCollection = (props: PopupConfig) => {
+    const listCollection = useSelector((state: any) => state?.listCollection)
 
-const testData = [{
-    id: "1",
-    title: "Download"
-}, {
-    id: "2",
-    title: "Favourist"
-}, {
-    id: "3",
-    title: "Lorem ipsum dolor sit"
-}, {
-    id: "4",
-    title: "Love myself"
-}, {
-    id: "5",
-    title: "DOwnload"
-}, {
-    id: "6",
-    title: "DOwnload"
-}, {
-    id: "7",
-    title: "DOwnload"
-}, {
-    id: "8",
-    title: "DOwnload"
-}, {
-    id: "9",
-    title: "DOwnload"
-}, {
-    id: "10",
-    title: "DOwnload"
-},]
-
-const renderItem = ({ item }) => (
-    <ItemMusic title={item.title} show={false} />
-);
-
-const PopupCollection = (props: PopupConfig = defaultProps) => {
-    const [visiable, setVisiable] = useState(props?.visiable)
+    const renderItem = ({ item }) => (
+        <ItemCollectionOnPopup data={item} setVisiable={props.setVisiable} />
+    );
 
     return (
-
         <Modal
             animationType="fade"
             transparent={true}
-            visible={visiable}
-        >
-
+            visible={props.visiable}>
             <View style={styles.constrainOpacity}></View>
             <TouchableOpacity
                 style={styles.centeredView}
-                onPress={() => { setVisiable(false) }}
+                onPress={() => { props.setVisiable(false) }}
                 activeOpacity={1}
             >
                 <View style={styles.modalView}>
                     <View style={{ height: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Text style={styles.title}>Select collection</Text>
-                        <TouchableOpacity onPress={() => { setVisiable(false) }}>
+                        <TouchableOpacity onPress={() => { props.setVisiable(false) }}>
                             <IconClose />
                         </TouchableOpacity>
-                    </View>
-                    <View style={{ height: 20, flexDirection: 'row', marginTop: 12, justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 16, color: "#8c8c8c" }}>Are you sure want to delete?</Text>
                     </View>
 
                     <Search
                         height={46}
                         marginTop={16}
                     />
+                    {/* 
+                    <View
+                        style={{ flexDirection: 'row', alignItems: 'center', height: 68, marginTop: 16, backgroundColor: 'red' }}
+                    >
+                        <View style={styles.image}>
+                            <Image
+                                style={styles.image}
+                                source={ImageMusicDefault}
+                            />
+                        </View>
+                        <TextInput
+                            style={{ flex: 1, marginLeft:12 }}
+                            placeholder='Search collection'
+                            placeholderTextColor={color.PLACEHOLDER}
+                            selectionColor={color.PLACEHOLDER}
+                            multiline={false}
+                            numberOfLines={1}
+                        />
+                    </View> */}
 
-                    <View style={{flex: 1, marginTop: 20 }}>
+                    <View style={{ flex: 1, marginTop: 20 }}>
                         <FlatList
-                            data={testData}
+                            data={listCollection}
                             renderItem={renderItem}
-                            keyExtractor={item => item.id}
+                            keyExtractor={item => item.id.toString()}
                         />
                     </View>
 
                     <View style={{ justifyContent: 'flex-end', flexDirection: 'row' }}>
-                        <TouchableOpacity style={styles.buttonPlus}>
+                        <TouchableOpacity
+                            style={styles.buttonPlus}
+                            onPress={() => {
+                                props.setVisiable(false);
+                                props.setVisiableCreate(true)
+                            }}
+                        >
                             <IconPlus />
                         </TouchableOpacity>
                     </View>
@@ -160,7 +150,12 @@ const styles = StyleSheet.create({
         left: 0,
         height: metric.DEVICE_HEIGHT,
         width: metric.DEVICE_WIDTH
-    }
+    },
+    image: {
+        height: 48,
+        width: 48,
+        borderRadius: 12,
+    },
 });
 
 export default PopupCollection;
