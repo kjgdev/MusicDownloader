@@ -1,5 +1,5 @@
 import { ListMusic } from '@scenes';
-import { HIDDEN_TABBAR, SHOW_CONTROL_MUSIC, LOAD_COLLECTION, LOAD_MUSIC, EDIT_MODE, ADD_ITEM_COLL_EDIT, REMOVE_ITEM_COLL_EDIT, ADD_ITEM_MUSIC_EDIT, REMOVE_ITEM_MUSIC_EDIT, SHOW_POPUP_RENAME, RESET_EDIT } from './constrans';
+import { HIDDEN_TABBAR, SHOW_CONTROL_MUSIC, LOAD_COLLECTION, LOAD_MUSIC, EDIT_MODE, ADD_ITEM_COLL_EDIT, REMOVE_ITEM_COLL_EDIT, ADD_ITEM_MUSIC_EDIT, REMOVE_ITEM_MUSIC_EDIT, SHOW_POPUP_RENAME, RESET_EDIT, SET_SOUND, SET_SOUND_STATUS, SET_CURRENT_SOUND } from './constrans';
 
 var initState = {
     showMusic: false,
@@ -8,8 +8,11 @@ var initState = {
     listCollection: [],
     listMusic: [],
     listCollectionEdit: [],
-    listEditMusic:[],
-    popupRename:false,
+    listEditMusic: [],
+    popupRename: false,
+    soundTask: undefined,
+    soundTaskStatus: false,
+    currentMusic: []
 };
 
 export const rootReducer = (state: any = initState, action: any) => {
@@ -36,7 +39,7 @@ export const rootReducer = (state: any = initState, action: any) => {
             return {
                 ...state,
                 listCollection: action.payload,
-                listCollectionEdit:[]
+                listCollectionEdit: []
             }
         }
         case LOAD_MUSIC: {
@@ -49,8 +52,8 @@ export const rootReducer = (state: any = initState, action: any) => {
             return {
                 ...state,
                 editMode: action.payload,
-                listCollectionEdit:[],
-                listEditMusic:[]
+                listCollectionEdit: [],
+                listEditMusic: []
             }
         }
         case ADD_ITEM_COLL_EDIT: {
@@ -87,7 +90,25 @@ export const rootReducer = (state: any = initState, action: any) => {
             return {
                 ...state,
                 listEditMusic: [],
-                listCollectionEdit:[]
+                listCollectionEdit: []
+            }
+        }
+        case SET_SOUND: {
+            return {
+                ...state,
+                soundTask: action.payload
+            }
+        }
+        case SET_SOUND_STATUS: {
+            return {
+                ...state,
+                soundTaskStatus: action.payload
+            }
+        }
+        case SET_CURRENT_SOUND: {
+            return {
+                ...state,
+                currentMusic: action.payload
             }
         }
 

@@ -15,6 +15,7 @@ import IconSkipNext from './skipnext'
 import IconError from './error'
 import IconClose from './close'
 import IconPlus from './plus'
+import IconPause from './pause'
 
 export {
     IconDownArrow,
@@ -33,5 +34,6 @@ export {
     IconSkipNext,
     IconError,
     IconClose,
-    IconPlus
+    IconPlus,
+    IconPause
 }

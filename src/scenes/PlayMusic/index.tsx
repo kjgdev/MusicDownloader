@@ -1,20 +1,86 @@
-import { IconPlay, IconRepeat, IconShuffle, IconSkipForward, IconSkipNext } from '@assets/svg';
+import { IconPause, IconPlay, IconRepeat, IconShuffle, IconSkipForward, IconSkipNext } from '@assets/svg';
 import Header3 from '@components/atoms/Header3';
 import color from '@config/colors';
 import metric from '@config/metrics';
 import stylesGeneral from '@config/stylesGeneral';
-import React, { Component } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import React, { Component, useEffect, useState } from 'react';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import MusicControl, { Command } from 'react-native-music-control';
+import Sound from 'react-native-sound';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSound, setSoundStatus, showMusicControl } from '@services/redux/actions';
+import ItemMusicInPlayMusic from '@components/atoms/ItemMusicInPlayMusic';
 
+const renderItem = ({ item }) => (
+    <ItemMusicInPlayMusic data={item} />
+);
 
-const PlayMusic = () => {
+const PlayMusic = (props: any) => {
+    const soundTask = useSelector((state: any) => state.soundTask)
+    const soundTaskStatus = useSelector((state: any) => state?.soundTaskStatus)
+
+    const dispatch = useDispatch()
+    const listMusic = useSelector((state: any) => state?.listMusic)
+    const currentMusic = useSelector((state: any) => state?.currentMusic)
+
+    useEffect(()=>{
+        console.log("🚀 ~ file: index.tsx ~ line 31 ~ PlayMusic ~ soundTask", soundTask)
+        soundTask.play()
+    },[soundTask])
+
     return (
         <View style={[stylesGeneral.container, { alignItems: 'center', flexDirection: 'column' }]}>
             <Header3 />
-            <View style={styles.image}>
+            <View style={{ flex: 1, width: metric.DEVICE_WIDTH, padding: 16 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <View style={{ backgroundColor: 'yellow', height: 100, width: 100, marginLeft: 8, borderRadius: 12 }}>
+                    </View>
+                    <View style={{ height: 100, flex: 1, marginLeft: 16, padding: 8 }}>
+                        <Text style={{ fontSize: 16, color: color.TITLE, fontWeight: 'bold' }}>{currentMusic?.data.name}</Text>
+                        <Text style={{ fontSize: 13, color: color.TITLE }}>Geogre Simpson</Text>
+
+                    </View>
+                </View>
+
+                <View style={{ height: 60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
+                    {soundTaskStatus ?
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => {
+                                soundTask.pause()
+                                dispatch(setSoundStatus(false))
+                            }}
+                        >
+                            <IconPause />
+                        </TouchableOpacity>
+                        :
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => {
+                                soundTask.play()
+                                dispatch(setSoundStatus(true))
+                            }}
+                        >
+                            <IconPlay />
+                        </TouchableOpacity>
+                    }
+                    <TouchableOpacity style={styles.button}>
+                        <IconShuffle />
+
+                    </TouchableOpacity>
+                </View>
+            </View>
+
+            <View style={{ flex: 3, width: metric.DEVICE_WIDTH, padding: 16 }}>
+                <FlatList
+                    data={listMusic}
+                    renderItem={renderItem}
+                    keyExtractor={item => item.id.toString()}
+                />
+            </View>
+            {/* <View style={styles.image}>
             </View>
             <View style={[stylesGeneral.centerAll, { marginTop: 12 }]}>
                 <Text style={styles.name} numberOfLines={1} >Lorem ipsum Lorem ipsum...</Text>
@@ -39,6 +105,25 @@ const PlayMusic = () => {
                     <IconSkipForward />
                 </TouchableOpacity>
 
+                {isPlay ?
+                    <TouchableOpacity
+                        style={[stylesGeneral.centerAll, styles.buttonPlay]}
+                        onPress={() => {
+                            soundTask.pause()
+                            setIsPlay(false)
+                        }}
+                    >
+                        <IconSkipForward />
+                    </TouchableOpacity> :
+                    <TouchableOpacity
+                        style={[stylesGeneral.centerAll, styles.buttonPlay]}
+                        onPress={() => {
+                            soundTask.play()
+                            setIsPlay(true)
+                        }}
+                    >
+                        <IconPlay />
+                    </TouchableOpacity>}
                 <TouchableOpacity style={[stylesGeneral.centerAll, styles.buttonPlay]}>
                     <IconPlay />
                 </TouchableOpacity>
@@ -55,7 +140,7 @@ const PlayMusic = () => {
 
             <View style={styles.constainList} >
 
-            </View>
+            </View> */}
 
 
         </View>
@@ -68,7 +153,7 @@ const styles = StyleSheet.create({
         width: metric.DEVICE_WIDTH - 70,
         backgroundColor: 'yellow',
         marginTop: 28,
-        borderRadius:24
+        borderRadius: 24
     },
     name: {
         fontSize: 20,
@@ -100,6 +185,14 @@ const styles = StyleSheet.create({
         marginTop: 44,
         width: metric.DEVICE_WIDTH,
         flex: 1
+    },
+    button: {
+        height: 44,
+        backgroundColor: color.BUTTON_SHUFFLE,
+        width: metric.DEVICE_WIDTH / 2 - 32,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })
 

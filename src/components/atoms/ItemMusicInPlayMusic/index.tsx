@@ -9,67 +9,32 @@ import MusicControl, { Command } from 'react-native-music-control'
 import Sound from 'react-native-sound'
 import ControlMusic from '../ControlMusic';
 import { useSelector, useDispatch } from 'react-redux';
-import { addItemMusicEdit, removeItemMusicEdit, setCurrentSound, setSound, setSoundStatus, showMusicControl } from '@services/redux/actions';
+import { addItemMusicEdit, removeItemMusicEdit, setCurrentSound, setSound, setSoundStatus } from '@services/redux/actions';
 import { useNavigation } from '@react-navigation/native';
 import { PLAYMUSIC } from '@config/constrans';
 
 
-const ItemMusic = (item: any) => {
+const ItemMusicInPlayMusic = (item: any) => {
     const navigation = useNavigation();
-    const editMode = useSelector((state: any) => state?.editMode)
-    const [select, setSelect] = useState(false);
     const dispatch = useDispatch();
     const soundTask = useSelector((state: any) => state?.soundTask)
-
-    useEffect(() => {
-        if (select) {
-            dispatch(addItemMusicEdit(item.data))
-        }
-        else {
-            dispatch(removeItemMusicEdit(item.data))
-        }
-    }, [select])
 
     return (
         <TouchableOpacity
             style={[styles.constain]} activeOpacity={0.5}
             onPress={() => {
-                if (editMode) {
-                    setSelect(!select)
-                }
-                else {
-                    let sound = new Sound(item.data.path, Sound.MAIN_BUNDLE, (error) => {
+                soundTask.release()
+                dispatch(setSoundStatus(false))
+                dispatch(setSound(
+                    new Sound(item.data.path, Sound.MAIN_BUNDLE, (error) => {
                         if (error) {
-                            console.log('failed to load the sound', error);
                             return;
                         }
-                        console.log('duration in seconds: ' + sound.getDuration() + 'number of channels: ' + sound.getNumberOfChannels());
-                    })
-                    dispatch(setSound(sound))
-                    dispatch(showMusicControl(true))
-                    dispatch(setSoundStatus(true))
-                    dispatch(setCurrentSound(item))
-                    navigation.navigate(PLAYMUSIC, { data: item });
-                }
+                        dispatch(setCurrentSound(item))
+                        soundTask.play()
+                    })))
             }}
         >
-            {editMode ? (<View style={{ height: 62 }} >
-                <CheckBox
-                    containerStyle={{ padding: 0, justifyContent: 'center', alignItems: "center", flex: 1 }}
-                    iconRight
-                    size={20}
-                    uncheckedColor={color.CHECKBOX_UNCHECK}
-                    checkedColor={color.CHECKBOX_CHECK}
-                    checkedIcon='dot-circle-o'
-                    uncheckedIcon='circle-o'
-                    checked={select}
-                    onPress={() => {
-                        if (editMode) {
-                            setSelect(!select)
-                        }
-                    }}
-                />
-            </View>) : null}
             <View
                 style={{ flexDirection: 'row', borderBottomWidth: 1, alignItems: 'center', flex: 1, borderColor: color.LINE }}
             >
@@ -110,4 +75,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default ItemMusic;
+export default ItemMusicInPlayMusic;

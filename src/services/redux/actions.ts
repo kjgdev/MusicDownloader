@@ -1,17 +1,20 @@
 import {
-     SHOW_CONTROL_MUSIC,
-      HIDDEN_TABBAR, 
-      LOAD_COLLECTION, 
-      LOAD_MUSIC, 
-      EDIT_MODE, 
-      ADD_ITEM_COLL_EDIT, 
-      REMOVE_ITEM_COLL_EDIT,
-       ADD_ITEM_MUSIC_EDIT, 
-       REMOVE_ITEM_MUSIC_EDIT, 
-       SHOW_POPUP_RENAME,
-       RESET_EDIT,
-    
-    } from './constrans';
+    SHOW_CONTROL_MUSIC,
+    HIDDEN_TABBAR,
+    LOAD_COLLECTION,
+    LOAD_MUSIC,
+    EDIT_MODE,
+    ADD_ITEM_COLL_EDIT,
+    REMOVE_ITEM_COLL_EDIT,
+    ADD_ITEM_MUSIC_EDIT,
+    REMOVE_ITEM_MUSIC_EDIT,
+    SHOW_POPUP_RENAME,
+    RESET_EDIT,
+    SET_SOUND,
+    SET_SOUND_STATUS,
+    SET_CURRENT_SOUND,
+
+} from './constrans';
 
 export const showMusicControl = (status: boolean) => {
     return {
@@ -86,5 +89,26 @@ export const removeItemMusicEdit = (data) => {
 export const resetEdit = () => {
     return {
         type: RESET_EDIT
+    }
+}
+
+export const setSound = (data: any) => {
+    return {
+        type: SET_SOUND,
+        payload: data
+    }
+}
+
+export const setSoundStatus = (status: any) => {
+    return {
+        type: SET_SOUND_STATUS,
+        payload: status
+    }
+}
+
+export const setCurrentSound = (data: any) => {
+    return {
+        type: SET_CURRENT_SOUND,
+        payload: data
     }
 }

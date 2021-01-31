@@ -28,7 +28,12 @@ const CollectionStack = () => {
                     animationEnabled: false,
                 }}
             ></StackCollection.Screen>
-            <StackCollection.Screen name={PLAYMUSIC} component={PlayMusic}></StackCollection.Screen>
+            <StackCollection.Screen
+                name={PLAYMUSIC}
+                component={PlayMusic}
+                options={{
+                    animationEnabled: false,
+                }} ></StackCollection.Screen>
         </StackCollection.Navigator>
     )
 }
